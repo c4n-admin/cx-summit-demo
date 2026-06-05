@@ -1,0 +1,177 @@
+# ALOTECH Customer Service Analytics Demo
+
+Bu proje, müşteri hizmetleri görüşmelerini görüşme sonrasında analiz eden local LLM destekli bir demo uygulamasıdır.
+
+Uygulama; görüşme metnini analiz eder, özet çıkarır, duygu skoru üretir, temsilci kalite metriklerini gösterir ve takip aksiyonlarını insan onayına sunar.
+
+## Özellikler
+
+* Türkçe / İngilizce arayüz
+* Görüşme metni analizi
+* Duygu skoru ve duygu değişim grafiği
+* Çözüm güven skoru
+* Temsilci kalite skorları
+* Önerilen takip aksiyonları
+* Talep kaydı, e-posta ve CRM notu taslakları
+* İnsan onaylı aksiyon akışı
+* Local LLM bağlantısı
+* Podman ile container üzerinde çalışma
+
+## Proje Yapısı
+
+```text
+Alotech demo/
+│
+├── app/
+│   ├── __init__.py
+│   ├── config.py
+│   ├── llm_client.py
+│   ├── main.py
+│   ├── schemas.py
+│   └── index.html
+│
+├── requirements.txt
+├── Containerfile
+├── .containerignore
+└── .env
+```
+
+## Portlar
+
+```text
+Dashboard + Backend:
+http://localhost:8080
+
+Local LLM:
+http://localhost:8001
+```
+
+## .env Dosyası
+
+Podman ile çalıştırırken `.env` dosyası şu şekilde olmalıdır:
+
+```env
+APP_HOST=0.0.0.0
+APP_PORT=8080
+
+LLM_API_BASE=http://host.containers.internal:8001
+LLM_MODEL=google/gemma-4-26B-A4B-it
+LLM_API_KEY=lm-studio
+LLM_TIMEOUT_SECONDS=600
+```
+
+Local Python ile çalıştırılacaksa:
+
+```env
+LLM_API_BASE=http://localhost:8001
+```
+
+## Kurulum
+
+Proje dizinine gir:
+
+Image build et:
+
+```powershell
+podman build --no-cache -t localhost/alotech-demo:local-llm .
+```
+
+Container'ı çalıştır:
+
+```powershell
+podman run --rm -p 8080:8080 --env-file .env --name alotech-demo localhost/alotech-demo:local-llm
+```
+
+Tarayıcıdan aç:
+
+```text
+http://localhost:8080
+```
+
+## Kontrol Endpointleri
+
+Backend çalışıyor mu kontrol etmek için:
+
+```text
+http://localhost:8080/api/health
+```
+
+LLM bağlantısını kontrol etmek için:
+
+```text
+http://localhost:8080/api/llm-health
+```
+
+## Local LLM Model Adı
+
+Local LLM tarafındaki model adını görmek için:
+
+```text
+http://localhost:8001/v1/models
+```
+
+Dönen model `id` değerini `.env` içindeki `LLM_MODEL` alanına yazabilirsin.
+
+Örnek:
+
+```env
+LLM_MODEL=qwen2.5-7b-instruct
+```
+
+## Kullanım
+
+1. Uygulamayı aç.
+2. Dil seçimini yap.
+3. Senaryoyu seç.
+4. Sol tarafta görüşme metnini incele.
+5. `Analyze Call` / `Görüşmeyi Analiz Et` butonuna bas.
+6. Orta panelde özet, duygu skoru ve kalite metriklerini gör.
+7. Sağ panelde önerilen takip aksiyonlarını onayla, reddet veya geri al.
+8. Gerekirse raporu dışa aktar.
+
+## Notlar
+
+* Bu demo müşteriyle doğrudan konuşan bir ajan değildir.
+* Görüşmeyi insan temsilci yürütür.
+* Local LLM yalnızca görüşme sonrası analiz yapar.
+* Hiçbir aksiyon otomatik olarak müşteriye gönderilmez.
+* Tüm aksiyonlar insan onayına sunulan taslaklardır.
+
+## Sık Karşılaşılan Sorunlar
+
+### Değişiklikler görünmüyor
+
+`index.html` veya backend dosyaları değiştirildiyse image yeniden build edilmelidir:
+
+```powershell
+podman rm -f alotech-demo
+podman rmi -f localhost/alotech-demo:local-llm
+podman build --no-cache -t localhost/alotech-demo:local-llm .
+podman run --rm -p 8080:8080 --env-file .env --name alotech-demo localhost/alotech-demo:local-llm
+```
+
+### LLM bağlantısı çalışmıyor
+
+Podman kullanıyorsan `.env` içinde şu değer olmalı:
+
+```env
+LLM_API_BASE=http://host.containers.internal:8001
+```
+
+Local Python kullanıyorsan:
+
+```env
+LLM_API_BASE=http://localhost:8001
+```
+
+### index.html bulunamıyor
+
+`index.html` dosyası şu konumda olmalıdır:
+
+```text
+app/index.html
+```
+
+## Kısa Açıklama
+
+ALOTECH Customer Service Analytics Demo, müşteri hizmetleri görüşmelerini local LLM ile analiz eden, görüşme sonrası özet, duygu skoru, kalite metrikleri ve takip aksiyonları üreten bir demo uygulamasıdır.

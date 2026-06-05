@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Service Analytics Dashboard</title>
+  <style>
+
+    :root {
+      --bg:#f4f7fb;
+      --surface:#ffffff;
+      --surface-2:#f8fafc;
+      --surface-3:#eef6ff;
+      --navy:#0f172a;
+      --text:#172033;
+      --muted:#64748b;
+      --muted-2:#94a3b8;
+      --border:#d9e4f2;
+      --border-strong:#b7c9e4;
+      --primary:#2563eb;
+      --primary-2:#0ea5e9;
+      --primary-soft:#dbeafe;
+      --green:#16a34a;
+      --green-soft:#dcfce7;
+      --yellow:#d97706;
+      --yellow-soft:#fef3c7;
+      --red:#dc2626;
+      --red-soft:#fee2e2;
+      --purple:#7c3aed;
+      --shadow:0 18px 45px rgba(15,23,42,.10);
+      --shadow-sm:0 8px 24px rgba(15,23,42,.07);
+      --radius-lg:22px;
+      --radius-md:16px;
+      --radius-sm:12px;
+    }
+
+    * { box-sizing:border-box; }
+
+    body {
+      margin:0;
+      min-height:100vh;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 8% 8%,rgba(37,99,235,.12),transparent 26%),
+        radial-gradient(circle at 90% 12%,rgba(14,165,233,.12),transparent 28%),
+        linear-gradient(135deg,#fbfdff 0%,#f4f7fb 44%,#edf5ff 100%);
+      overflow:hidden;
+    }
+
+    button,select { font:inherit; }
+
+    .app {
+      height:100vh;
+      padding:18px;
+      display:grid;
+      grid-template-rows:auto auto 1fr;
+      gap:14px;
+    }
+
+    .glass {
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.88);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(16px);
+    }
+
+    .hero {
+      border-radius:var(--radius-lg);
+      padding:18px 20px;
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      gap:18px;
+      align-items:center;
+      background:
+        linear-gradient(120deg,rgba(255,255,255,.96),rgba(239,246,255,.92)),
+        #ffffff;
+      border:1px solid #cfe0f6;
+    }
+
+    .logo {
+      width:56px;
+      height:56px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      font-weight:1000;
+      color:#fff;
+      background:linear-gradient(135deg,var(--primary),var(--primary-2));
+      box-shadow:0 12px 24px rgba(37,99,235,.24);
+    }
+
+    .eyebrow {
+      color:var(--primary);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      margin-bottom:5px;
+    }
+
+    h1,h2,h3,p { margin:0; }
+
+    h1 {
+      color:var(--navy);
+      font-size:30px;
+      line-height:1.05;
+      letter-spacing:-.045em;
+      margin-bottom:6px;
+    }
+
+    .subtitle {
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+      max-width:760px;
+    }
+
+    .hero-actions {
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:9px;
+      flex-wrap:wrap;
+    }
+
+    .btn,.select,.pill {
+      border:1px solid #bdd2ee;
+      background:#ffffff;
+      color:#1e3a8a;
+      border-radius:999px;
+      padding:9px 14px;
+      font-size:12px;
+      font-weight:850;
+      cursor:pointer;
+      transition:.18s ease;
+      outline:none;
+      box-shadow:0 4px 14px rgba(15,23,42,.04);
+    }
+
+    .btn:hover {
+      transform:translateY(-1px);
+      border-color:#93b4e6;
+      background:#f8fbff;
+      box-shadow:0 8px 20px rgba(37,99,235,.10);
+    }
+
+    .select {
+      appearance:none;
+      min-width:188px;
+      background:
+        linear-gradient(135deg,#ffffff,#eef6ff);
+      color:#0f172a;
+      padding-right:32px;
+    }
+
+    .select option {
+      background-color:#ffffff;
+      color:#0f172a;
+    }
+
+    .select option:checked {
+      background-color:#2563eb;
+      color:#ffffff;
+    }
+
+    .btn.primary {
+      background:linear-gradient(135deg,var(--primary),var(--primary-2));
+      border-color:transparent;
+      color:#ffffff;
+      box-shadow:0 10px 22px rgba(37,99,235,.22);
+    }
+
+    .btn.danger {
+      border-color:#fecaca;
+      background:#fff7f7;
+      color:#b91c1c;
+    }
+
+    .pill {
+      cursor:default;
+      background:var(--green-soft);
+      border-color:#bbf7d0;
+      color:#166534;
+    }
+
+    .story-strip {
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:12px;
+    }
+
+    .story-step {
+      border-radius:var(--radius-md);
+      padding:14px;
+      background:#ffffff;
+      border:1px solid var(--border);
+      cursor:pointer;
+      transition:.18s ease;
+      position:relative;
+      overflow:hidden;
+      box-shadow:var(--shadow-sm);
+    }
+
+    .story-step::before {
+      content:"";
+      position:absolute;
+      left:0;
+      top:0;
+      bottom:0;
+      width:4px;
+      background:transparent;
+      transition:.18s ease;
+    }
+
+    .story-step:hover,.story-step.active {
+      transform:translateY(-2px);
+      border-color:#9fc0f0;
+      background:#f8fbff;
+    }
+
+    .story-step.active::before {
+      background:linear-gradient(180deg,var(--primary),var(--primary-2));
+    }
+
+    .story-step.done {
+      border-color:#bbf7d0;
+      background:#f0fdf4;
+    }
+
+    .step-num {
+      color:var(--primary);
+      font-size:10px;
+      font-weight:950;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      margin-bottom:6px;
+    }
+
+    .step-title {
+      color:var(--navy);
+      font-size:13px;
+      font-weight:900;
+      margin-bottom:4px;
+    }
+
+    .step-desc {
+      color:var(--muted);
+      font-size:11px;
+      line-height:1.35;
+    }
+
+    .main {
+      min-height:0;
+      display:grid;
+      grid-template-columns:1.05fr 1.22fr 1fr;
+      gap:14px;
+    }
+
+    .panel {
+      min-height:0;
+      border-radius:var(--radius-lg);
+      overflow:hidden;
+      background:#ffffff;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+    }
+
+    .panel-header {
+      min-height:72px;
+      padding:16px 18px 13px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      background:linear-gradient(180deg,#ffffff,#f8fafc);
+    }
+
+    .panel-title h2 {
+      color:var(--navy);
+      font-size:18px;
+      letter-spacing:-.025em;
+    }
+
+    .panel-body {
+      height:calc(100% - 72px);
+      overflow:auto;
+      padding:16px;
+      background:linear-gradient(180deg,#ffffff,#fbfdff);
+    }
+
+    .mini-tabs {
+      display:inline-flex;
+      gap:4px;
+      padding:4px;
+      background:#eef6ff;
+      border:1px solid var(--border);
+      border-radius:999px;
+    }
+
+    .tab {
+      border:0;
+      background:transparent;
+      color:var(--muted);
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:850;
+      cursor:pointer;
+    }
+
+    .tab.active {
+      color:#1d4ed8;
+      background:#ffffff;
+      box-shadow:0 3px 10px rgba(15,23,42,.08);
+    }
+
+    .customer-card {
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      gap:11px;
+      align-items:center;
+      padding:12px;
+      border-radius:var(--radius-md);
+      background:#f8fafc;
+      border:1px solid var(--border);
+      margin-bottom:12px;
+    }
+
+    .avatar {
+      width:40px;
+      height:40px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      font-weight:950;
+      background:#dbeafe;
+      border:1px solid #bfdbfe;
+      color:#1d4ed8;
+    }
+
+    .customer-name {
+      color:var(--navy);
+      font-size:13px;
+      font-weight:900;
+      margin-bottom:2px;
+    }
+
+    .customer-meta {
+      color:var(--muted);
+      font-size:11px;
+    }
+
+    .risk-badge {
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:900;
+      color:#92400e;
+      background:#fffbeb;
+      border:1px solid #fde68a;
+    }
+
+    .message {
+      max-width:94%;
+      padding:12px 13px;
+      border-radius:16px;
+      margin-bottom:10px;
+      border:1px solid var(--border);
+      cursor:pointer;
+      transition:.18s ease;
+      font-size:13px;
+      line-height:1.48;
+      color:#334155;
+      background:#ffffff;
+    }
+
+    .message .role {
+      display:flex;
+      justify-content:space-between;
+      color:#64748b;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:6px;
+    }
+
+    .message.rep {
+      background:#f0f9ff;
+      border-color:#bae6fd;
+    }
+
+    .message.customer {
+      margin-left:auto;
+      background:#f5f3ff;
+      border-color:#ddd6fe;
+    }
+
+    .message.issue {
+      border-color:#fcd34d;
+      background:#fffbeb;
+    }
+
+    .message:hover,.message.selected {
+      transform:translateY(-1px);
+      border-color:#60a5fa;
+      box-shadow:0 10px 22px rgba(37,99,235,.10);
+    }
+
+    .message.flagged {
+      border-color:#f87171;
+      background:#fff1f2;
+    }
+
+    .quick-actions,.action-menu,.preview-grid,.trust-row {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:9px;
+      margin-bottom:12px;
+    }
+
+    .quick-actions { margin-top:12px; }
+
+    .small-btn {
+      border:1px solid #bdd2ee;
+      background:#ffffff;
+      color:#1e3a8a;
+      border-radius:14px;
+      padding:9px 8px;
+      font-size:11px;
+      font-weight:850;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+
+    .small-btn:hover {
+      background:#f8fbff;
+      border-color:#93b4e6;
+      transform:translateY(-1px);
+    }
+
+    .extract-box {
+      position:sticky;
+      bottom:0;
+      margin-top:12px;
+      border-radius:16px;
+      padding:13px;
+      background:#ffffff;
+      border:1px solid #bfdbfe;
+      color:#475569;
+      font-size:12px;
+      line-height:1.48;
+      box-shadow:0 8px 24px rgba(37,99,235,.08);
+    }
+
+    .insight-grid {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .insight-card {
+      padding:16px;
+      border-radius:18px;
+      background:#ffffff;
+      border:1px solid var(--border);
+      min-width:0;
+      box-shadow:var(--shadow-sm);
+    }
+
+    .insight-card.full { grid-column:1/-1; }
+
+    .card-head {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:11px;
+    }
+
+    .card-head h3 {
+      color:var(--navy);
+      font-size:14px;
+      font-weight:900;
+    }
+
+    .tag {
+      color:#64748b;
+      font-size:10px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.09em;
+      white-space:nowrap;
+    }
+
+    .summary {
+      color:#475569;
+      font-size:13px;
+      line-height:1.62;
+    }
+
+    .editable-summary {
+      padding:12px;
+      border-radius:14px;
+      background:#f8fafc;
+      border:1px solid #dbe3ee;
+      color:#263245;
+      min-height:90px;
+      outline:none;
+      line-height:1.55;
+    }
+
+    .editable-summary:focus {
+      border-color:#93c5fd;
+      box-shadow:0 0 0 4px rgba(59,130,246,.12);
+      background:#ffffff;
+    }
+
+    .big-score {
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:12px;
+    }
+
+    .score {
+      color:var(--navy);
+      font-size:38px;
+      line-height:1;
+      font-weight:1000;
+      letter-spacing:-.06em;
+    }
+
+    .score-note {
+      font-size:12px;
+      font-weight:850;
+      color:#166534;
+      text-align:right;
+    }
+
+    .sentiment-track {
+      height:12px;
+      border-radius:999px;
+      background:linear-gradient(90deg,#fecaca,#fde68a,#bbf7d0);
+      border:1px solid rgba(15,23,42,.06);
+      overflow:hidden;
+    }
+
+    .sentiment-fill {
+      height:100%;
+      width:82%;
+      background:linear-gradient(90deg,#ef4444,#f59e0b,#22c55e);
+      border-radius:inherit;
+    }
+
+    .gauge-wrap {
+      display:grid;
+      grid-template-columns:112px 1fr;
+      gap:14px;
+      align-items:center;
+    }
+
+    .gauge {
+      width:106px;
+      height:106px;
+      border-radius:50%;
+      background:conic-gradient(var(--green) 0 96%,#e2e8f0 96% 100%);
+      display:grid;
+      place-items:center;
+      position:relative;
+    }
+
+    .gauge::before {
+      content:"";
+      position:absolute;
+      inset:12px;
+      background:#ffffff;
+      border-radius:50%;
+      border:1px solid #e2e8f0;
+    }
+
+    .gauge span {
+      position:relative;
+      z-index:1;
+      color:var(--navy);
+      font-size:27px;
+      font-weight:1000;
+    }
+
+    .metric-list { display:grid; gap:10px; }
+
+    .metric-row {
+      display:grid;
+      grid-template-columns:96px 1fr 34px;
+      gap:9px;
+      align-items:center;
+      color:#334155;
+      font-size:12px;
+    }
+
+    .bar-track {
+      height:8px;
+      border-radius:999px;
+      background:#e2e8f0;
+      overflow:hidden;
+    }
+
+    .bar-fill {
+      height:100%;
+      width:var(--w);
+      border-radius:inherit;
+      background:linear-gradient(90deg,#38bdf8,#22c55e);
+    }
+
+    .timeline {
+      height:126px;
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:9px;
+      align-items:end;
+      padding-top:14px;
+    }
+
+    .tbar {
+      height:var(--h);
+      border-radius:12px 12px 6px 6px;
+      background:linear-gradient(180deg,#38bdf8,#6366f1);
+      position:relative;
+      cursor:pointer;
+      opacity:.86;
+    }
+
+    .tbar span {
+      position:absolute;
+      left:50%;
+      bottom:calc(100% + 7px);
+      transform:translateX(-50%);
+      font-size:10px;
+      font-weight:900;
+      color:#1e293b;
+    }
+
+    .topic-cloud {
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .topic {
+      border:1px solid #bdd2ee;
+      background:#f8fbff;
+      border-radius:999px;
+      padding:8px 10px;
+      color:#1e3a8a;
+      font-size:11px;
+      font-weight:850;
+      cursor:pointer;
+    }
+
+    .topic.active {
+      border-color:#2563eb;
+      background:#dbeafe;
+    }
+
+    .copilot-card {
+      padding:14px;
+      border-radius:18px;
+      background:#f8fbff;
+      border:1px solid #cfe0f6;
+      margin-bottom:12px;
+    }
+
+    .copilot-status {
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .orb {
+      width:42px;
+      height:42px;
+      flex:0 0 auto;
+      border-radius:50%;
+      background:linear-gradient(135deg,var(--primary),var(--primary-2));
+      box-shadow:0 10px 24px rgba(37,99,235,.22);
+    }
+
+    .status-title {
+      color:var(--navy);
+      font-size:14px;
+      font-weight:950;
+      margin-bottom:3px;
+    }
+
+    .status-copy {
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    .preview-btn {
+      border:1px solid #bdd2ee;
+      background:#ffffff;
+      color:#1e3a8a;
+      border-radius:14px;
+      padding:10px 8px;
+      font-size:11px;
+      font-weight:850;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+
+    .preview-btn:hover,.preview-btn.active {
+      background:#dbeafe;
+      border-color:#93b4e6;
+    }
+
+    .output {
+      min-height:104px;
+      padding:13px;
+      border-radius:16px;
+      background:#f8fafc;
+      border:1px dashed #b6c7df;
+      color:#475569;
+      font-size:12px;
+      line-height:1.52;
+      margin-bottom:12px;
+    }
+
+    .suggestion-flow {
+      display:grid;
+      gap:10px;
+      margin-bottom:12px;
+    }
+
+    .flow-item {
+      display:grid;
+      grid-template-columns:34px 1fr auto;
+      align-items:center;
+      gap:11px;
+      padding:12px;
+      border-radius:16px;
+      background:#ffffff;
+      border:1px solid var(--border);
+      cursor:pointer;
+      transition:.18s ease;
+      box-shadow:0 6px 16px rgba(15,23,42,.04);
+    }
+
+    .flow-item:hover {
+      border-color:#93c5fd;
+      background:#f8fbff;
+      transform:translateY(-1px);
+    }
+
+    .flow-item.done {
+      border-color:#86efac;
+      background:#f0fdf4;
+    }
+
+    .flow-item.rejected {
+      border-color:#fca5a5;
+      background:#fff1f2;
+    }
+
+    .flow-index {
+      width:30px;
+      height:30px;
+      border-radius:11px;
+      display:grid;
+      place-items:center;
+      background:#e0f2fe;
+      color:#075985;
+      border:1px solid #bae6fd;
+      font-size:12px;
+      font-weight:1000;
+    }
+
+    .flow-title {
+      color:var(--navy);
+      font-size:13px;
+      font-weight:950;
+      margin-bottom:2px;
+    }
+
+    .flow-desc {
+      color:#64748b;
+      font-size:11px;
+      line-height:1.35;
+    }
+
+    .flow-state {
+      color:#92400e;
+      background:#fffbeb;
+      border:1px solid #fde68a;
+      padding:5px 8px;
+      border-radius:999px;
+      font-size:10px;
+      font-weight:950;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+
+    .flow-item.done .flow-state {
+      color:#166534;
+      background:#dcfce7;
+      border-color:#bbf7d0;
+    }
+
+    .flow-item.rejected .flow-state {
+      color:#991b1b;
+      background:#fee2e2;
+      border-color:#fecaca;
+    }
+
+    .trust {
+      padding:12px;
+      border-radius:16px;
+      background:#ffffff;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow-sm);
+    }
+
+    .trust strong {
+      color:var(--navy);
+      display:block;
+      font-size:17px;
+      margin-bottom:4px;
+    }
+
+    .trust span {
+      color:var(--muted);
+      font-size:10px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+    }
+
+    .activity-log {
+      max-height:120px;
+      overflow:auto;
+      padding:10px;
+      border-radius:16px;
+      background:#f8fafc;
+      border:1px solid var(--border);
+      color:#475569;
+      font-size:11px;
+      line-height:1.45;
+    }
+
+    .log-line {
+      display:flex;
+      gap:8px;
+      padding:5px 0;
+      border-bottom:1px solid #e2e8f0;
+    }
+
+    .log-time {
+      color:#1d4ed8;
+      font-weight:900;
+      white-space:nowrap;
+    }
+
+    .hidden { display:none; }
+
+    .toast {
+      position:fixed;
+      right:24px;
+      bottom:22px;
+      min-width:260px;
+      padding:13px 15px;
+      border-radius:16px;
+      background:#ffffff;
+      border:1px solid #bbf7d0;
+      color:#166534;
+      box-shadow:var(--shadow);
+      transform:translateY(16px);
+      opacity:0;
+      pointer-events:none;
+      transition:.25s ease;
+      z-index:100;
+      font-size:13px;
+      font-weight:850;
+    }
+
+    .toast.show {
+      transform:translateY(0);
+      opacity:1;
+    }
+
+    .modal-backdrop {
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.28);
+      backdrop-filter:blur(8px);
+      display:none;
+      place-items:center;
+      padding:24px;
+      z-index:90;
+    }
+
+    .modal-backdrop.show { display:grid; }
+
+    .modal {
+      max-width:780px;
+      width:100%;
+      border-radius:22px;
+      border:1px solid var(--border);
+      background:#ffffff;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .modal-head {
+      padding:18px 20px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      background:#f8fafc;
+    }
+
+    .modal-head h3 { color:var(--navy); }
+
+    .modal-body {
+      padding:20px;
+      color:#475569;
+      line-height:1.65;
+      font-size:14px;
+    }
+
+    .close {
+      border:1px solid #bdd2ee;
+      background:#ffffff;
+      color:#1e3a8a;
+      border-radius:999px;
+      padding:9px 12px;
+      cursor:pointer;
+      font-size:12px;
+      font-weight:850;
+    }
+
+    @media(max-width:1300px) {
+      html,body { overflow:auto; }
+      .app { height:auto; }
+      .main { grid-template-columns:1fr; }
+      .panel { min-height:560px; }
+      .story-strip { grid-template-columns:repeat(3,1fr); }
+    }
+
+    @media(max-width:820px) {
+      .hero { grid-template-columns:auto 1fr; }
+      .hero-actions { grid-column:1/-1; justify-content:flex-start; }
+      .story-strip,.insight-grid { grid-template-columns:1fr; }
+      .preview-grid,.trust-row,.action-menu,.quick-actions { grid-template-columns:1fr; }
+      .gauge-wrap { grid-template-columns:1fr; }
+    }
+
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="hero glass">
+      <div class="logo">CS</div>
+      <div>
+        <div class="eyebrow" id="heroEyebrow">Enterprise Demo · Human-Assisted Customer Service</div>
+        <h1 id="pageTitle">Customer Service Analytics Dashboard</h1>
+        <p class="subtitle" id="pageSubtitle">Post-call assistant for support teams: analyzes customer-representative conversations, drafts summaries, scores quality, and prepares follow-up suggestions for human approval.</p>
+      </div>
+      <div class="hero-actions">
+        <select class="select" id="scenarioSelect">
+          <option value="billing">Billing Support Demo</option>
+          <option value="retention">Retention Support Demo</option>
+          <option value="technical">Technical Support Demo</option>
+        </select>
+        <select class="select" id="languageSelect">
+          <option value="en">English</option>
+          <option value="tr">Türkçe</option>
+        </select>
+        <button class="btn" id="openPitch">Pitch</button>
+        <button class="btn" id="undoBtn">Undo Last</button>
+        <button class="btn danger" id="resetBtn">Reset</button>
+        <button class="btn primary" id="runDemo">Analyze Call</button>
+        <span class="pill" id="onlineStatus">● Copilot Online</span>
+      </div>
+    </header>
+
+    <section class="story-strip">
+      <div class="story-step active" data-step="0"><div class="step-num">Step 01</div><div class="step-title">Representative Call</div><div class="step-desc">Human-led support conversation.</div></div>
+      <div class="story-step" data-step="1"><div class="step-num">Step 02</div><div class="step-title">Post-Call Analysis</div><div class="step-desc">Intent, emotion, risk and root cause.</div></div>
+      <div class="story-step" data-step="2"><div class="step-num">Step 03</div><div class="step-title">Quality Insights</div><div class="step-desc">Sentiment, resolution, QA and compliance.</div></div>
+      <div class="story-step" data-step="3"><div class="step-num">Step 04</div><div class="step-title">Suggested Actions</div><div class="step-desc">Human-reviewable follow-up workflow.</div></div>
+      <div class="story-step" data-step="4"><div class="step-num">Step 05</div><div class="step-title">Human Control</div><div class="step-desc">Undo, reset, trace and approve safely.</div></div>
+    </section>
+
+    <section class="main">
+      <aside class="panel glass">
+        <div class="panel-header">
+          <div class="panel-title"><div class="eyebrow" id="conversationEyebrow">Conversation Layer</div><h2 id="transcriptTitle">Representative Transcript</h2></div>
+          <div class="mini-tabs"><button class="tab active" data-filter="all" id="tabAll">All</button><button class="tab" data-filter="customer" id="tabCustomer">Customer</button><button class="tab" data-filter="issue" id="tabIssues">Issues</button></div>
+        </div>
+        <div class="panel-body">
+          <div class="customer-card"><div class="avatar" id="avatar">SJ</div><div><div class="customer-name" id="customerName">Sarah Johnson</div><div class="customer-meta" id="customerMeta">Customer · Subscription Plan · Billing Queue</div></div><div class="risk-badge" id="riskBadge">P2 Risk</div></div>
+          <div id="transcriptList"></div>
+          <div class="quick-actions"><button class="small-btn" id="flagIssue">Flag Issue</button><button class="small-btn" id="clearFlags">Clear Flags</button><button class="small-btn" id="copySummary">Copy Summary</button></div>
+          <div class="extract-box" id="extractBox">Click a transcript line, step, topic or metric to show how the copilot interpreted the conversation.</div>
+        </div>
+      </aside>
+
+      <section class="panel glass">
+        <div class="panel-header"><div class="panel-title"><div class="eyebrow" id="intelligenceEyebrow">Post-Call Intelligence</div><h2 id="insightsTitle">Support Quality Insights</h2></div><button class="btn" id="switchInsights">Audit View</button></div>
+        <div class="panel-body">
+          <div class="insight-grid" id="overview">
+            <div class="insight-card full"><div class="card-head"><h3 id="summaryCardTitle">Editable Call Summary</h3><span class="tag" id="summaryCardTag">Copilot Draft · Editable</span></div><div class="editable-summary" id="summaryText" contenteditable="true"></div></div>
+            <div class="insight-card"><div class="card-head"><h3 id="sentimentCardTitle">Sentiment Recovery</h3><span class="tag">Red → Green</span></div><div class="big-score"><div><div class="score" id="sentimentScore">82%</div><div class="score-note" style="text-align:left;" id="sentimentLabel">Mostly positive</div></div><div class="score-note" id="sentimentDelta">+14 pts<br>after resolution</div></div><div class="sentiment-track"><div class="sentiment-fill" id="sentimentFill"></div></div></div>
+            <div class="insight-card"><div class="card-head"><h3 id="confidenceCardTitle">Resolution Confidence</h3><span class="tag" id="confidenceTag">Analysis Score</span></div><div class="gauge-wrap"><div class="gauge" id="confidenceGauge"><span id="confidenceScore">96</span></div><p class="summary" id="confidenceText"></p></div></div>
+            <div class="insight-card"><div class="card-head"><h3 id="qaCardTitle">Representative QA Scorecard</h3><span class="tag" id="qaTag">Supervisor View</span></div><div class="metric-list" id="qualityMetrics"></div></div>
+            <div class="insight-card"><div class="card-head"><h3 id="timelineCardTitle">Sentiment Timeline</h3><span class="tag">Interactive</span></div><div class="timeline" id="timeline"></div></div>
+            <div class="insight-card full"><div class="card-head"><h3 id="topicsCardTitle">Detected Topics & Signals</h3><span class="tag" id="topicsTag">Explainable Copilot</span></div><div class="topic-cloud" id="topicCloud"></div></div>
+          </div>
+          <div class="insight-grid hidden" id="detail">
+            <div class="insight-card full"><div class="card-head"><h3 id="reasoningCardTitle">Copilot Reasoning Trace</h3><span class="tag">Audit View</span></div><p class="summary" id="reasoningTrace"></p></div>
+            <div class="insight-card"><div class="card-head"><h3 id="routingCardTitle">Suggested Routing</h3><span class="tag">Ops</span></div><div class="score" id="priorityScore">P2</div><p class="summary" id="priorityText"></p></div>
+            <div class="insight-card"><div class="card-head"><h3 id="churnCardTitle">Churn Signal</h3><span class="tag" id="riskTag">Risk Indicator</span></div><div class="score" id="churnScore">Low</div><p class="summary" id="churnText"></p></div>
+            <div class="insight-card full"><div class="card-head"><h3 id="businessValueTitle">Business Value</h3><span class="tag" id="expoTag">Expo Talking Point</span></div><p class="summary" id="businessValueText">This demo positions AI as a copilot for customer service teams, not as a replacement for the representative.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel glass">
+        <div class="panel-header"><div class="panel-title"><div class="eyebrow" id="workflowEyebrow">Assisted Workflow</div><h2 id="workflowTitle">Suggested Follow-Up Actions</h2></div><button class="btn primary" id="approveAll">Approve Suggestions</button></div>
+        <div class="panel-body">
+          <div class="copilot-card"><div class="copilot-status"><div class="orb"></div><div><div class="status-title" id="copilotTitle">Copilot Ready</div><div class="status-copy" id="copilotCopy">Follow-up suggestions are prepared for human review.</div></div></div></div>
+          <div class="preview-grid"><button class="preview-btn" data-preview="ticket" id="ticketDraftBtn">Ticket Draft</button><button class="preview-btn" data-preview="email" id="emailDraftBtn">Email Draft</button><button class="preview-btn" data-preview="crm" id="crmDraftBtn">CRM Draft</button></div>
+          <div class="output" id="output">Select a drafted artifact to preview the copilot output.</div>
+          <div class="action-menu"><button class="small-btn" id="rejectSelected">Reject Selected</button><button class="small-btn" id="undoAction">Undo Action</button><button class="small-btn" id="resetActions">Reset Actions</button></div>
+          <div class="suggestion-flow" id="suggestionFlow"></div>
+          <div class="trust-row"><div class="trust"><strong id="complianceScore">94%</strong><span id="complianceLabel">Compliance</span></div><div class="trust"><strong id="modelConfidence">89%</strong><span id="confidenceLabel">Confidence</span></div><div class="trust"><strong id="humanValue">Human</strong><span id="approvalLabel">Approval</span></div></div>
+          <div class="activity-log" id="activityLog"></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="modalBackdrop"><div class="modal"><div class="modal-head"><h3 id="pitchTitle">Demo Pitch</h3><button class="close" id="closeModal">Close</button></div><div class="modal-body" id="pitchBody"></div></div></div>
+  <div class="toast" id="toast">Demo action completed</div>
+
+  <script>
+    const translations = {
+      en: {
+        heroEyebrow:"Enterprise Demo · Human-Assisted Customer Service", pageTitle:"Customer Service Analytics Dashboard", pageSubtitle:"Post-call assistant for support teams: analyzes customer-representative conversations, drafts summaries, scores quality, and prepares follow-up suggestions for human approval.",
+        scenarioOptions:["Billing Support Demo","Retention Support Demo","Technical Support Demo"], pitch:"Pitch", undoLast:"Undo Last", reset:"Reset", analyzeCall:"Analyze Call", online:"● Copilot Online",
+        story:[["Step 01","Representative Call","Human-led support conversation.","The representative handles the conversation. The copilot analyzes only after the call."],["Step 02","Post-Call Analysis","Intent, emotion, risk and root cause.","The copilot extracts intent, pain points, sentiment shifts, urgency and compliance signals."],["Step 03","Quality Insights","Sentiment, resolution, QA and compliance.","The copilot creates a readable summary and quality scorecard."],["Step 04","Suggested Actions","Human-reviewable follow-up workflow.","The copilot suggests ticket, email and CRM drafts."],["Step 05","Human Control","Undo, reset, trace and approve safely.","A human reviewer can approve, reject, undo or reset every suggestion."]],
+        conversationEyebrow:"Conversation Layer", transcriptTitle:"Representative Transcript", tabAll:"All", tabCustomer:"Customer", tabIssues:"Issues", flagIssue:"Flag Issue", clearFlags:"Clear Flags", copySummary:"Copy Summary", defaultExtract:"Click a transcript line, step, topic or metric to show how the copilot interpreted the conversation.",
+        intelligenceEyebrow:"Post-Call Intelligence", insightsTitle:"Support Quality Insights", auditView:"Audit View", overview:"Overview", summaryCardTitle:"Editable Call Summary", summaryCardTag:"Copilot Draft · Editable", sentimentCardTitle:"Sentiment Recovery", confidenceCardTitle:"Resolution Confidence", confidenceTag:"Analysis Score", qaCardTitle:"Representative QA Scorecard", qaTag:"Supervisor View", timelineCardTitle:"Sentiment Timeline", topicsCardTitle:"Detected Topics & Signals", topicsTag:"Explainable Copilot", reasoningCardTitle:"Copilot Reasoning Trace", routingCardTitle:"Suggested Routing", churnCardTitle:"Churn Signal", riskTag:"Risk Indicator", businessValueTitle:"Business Value", expoTag:"Expo Talking Point", businessValueText:"This demo positions AI as a copilot for customer service teams, not as a replacement for the representative. It reduces after-call work by drafting summaries, QA insights, CRM notes and follow-up suggestions.",
+        workflowEyebrow:"Assisted Workflow", workflowTitle:"Suggested Follow-Up Actions", approveSuggestions:"Approve Suggestions", copilotReady:"Copilot Ready", copilotReadyText:"Follow-up suggestions are prepared for human review.", ticketDraft:"Ticket Draft", emailDraft:"Email Draft", crmDraft:"CRM Draft", selectDraft:"Select a drafted artifact to preview the copilot output.", rejectSelected:"Reject Selected", undoAction:"Undo Action", resetActions:"Reset Actions", compliance:"Compliance", confidence:"Confidence", human:"Human", approval:"Approval",
+        pitchTitle:"Demo Pitch", close:"Close", pitchBody:"<strong>Customer Service Analytics is a post-call analysis workspace for human support teams.</strong><br><br>The representative still owns the customer conversation. After the call, the assistant analyzes the transcript, drafts a summary, produces quality and risk indicators, and prepares follow-up suggestions such as ticket drafts, email drafts, and CRM notes. Nothing is executed automatically: a human reviewer can approve, reject, undo, or reset every suggestion.",
+        labels:{customer:"Customer", representative:"Representative", ready:"Ready", approved:"Approved", rejected:"Rejected"}, logs:{language:"Language changed to English", loaded:"loaded", analysisStarted:"Local LLM post-call analysis started", analysisCompleted:"Local LLM post-call analysis completed", analysisFailed:"Local LLM analysis failed", suggestionApproved:"Approved suggestion", allApproved:"All suggestions approved", reset:"Demo reset"}
+      },
+      tr: {
+        heroEyebrow:"Kurumsal Demo · Görüşme Sonrası Destek Analizi", pageTitle:"Müşteri Hizmetleri Analiz Paneli", pageSubtitle:"Destek ekipleri için görüşme sonrası analiz paneli: konuşmayı özetler, duygu ve kalite skorlarını üretir, takip aksiyonlarını insan onayına hazırlar.",
+        scenarioOptions:["Faturalama Senaryosu","Müşteriyi Elde Tutma Senaryosu","Teknik Destek Senaryosu"], pitch:"Demo Özeti", undoLast:"Son İşlemi Geri Al", reset:"Sıfırla", analyzeCall:"Görüşmeyi Analiz Et", online:"● Asistan Aktif",
+        story:[["Adım 01","Müşteri Görüşmesi","Temsilci tarafından yürütülen destek görüşmesi.","Müşteriyle görüşmeyi temsilci yürütür. Asistan yalnızca görüşme tamamlandıktan sonra analiz yapar."],["Adım 02","Görüşme Analizi","Niyet, duygu, risk ve temel neden analizi.","Asistan; müşteri niyetini, problem alanını, duygu değişimini, aciliyeti ve uyum sinyallerini çıkarır."],["Adım 03","Kalite ve Duygu Skorları","Duygu durumu, çözüm güveni, kalite ve uyum.","Asistan okunabilir bir özet ve kalite skor kartı oluşturur."],["Adım 04","Takip Önerileri","İnsan onayına hazır takip aksiyonları.","Asistan ticket, e-posta ve CRM notu taslakları önerir."],["Adım 05","İnsan Onayı","Onaylama, reddetme, geri alma ve izlenebilirlik.","Temsilci veya supervisor her öneriyi onaylayabilir, reddedebilir, geri alabilir ya da sıfırlayabilir."]],
+        conversationEyebrow:"Görüşme Alanı", transcriptTitle:"Görüşme Metni", tabAll:"Tümü", tabCustomer:"Müşteri", tabIssues:"Riskli İfadeler", flagIssue:"Riskli İfadeleri İşaretle", clearFlags:"İşaretleri Kaldır", copySummary:"Özeti Kopyala", defaultExtract:"Asistanın görüşmeyi nasıl yorumladığını görmek için konuşma satırına, adıma, konuya veya metriğe tıklayın.",
+        intelligenceEyebrow:"Görüşme Sonrası Analiz", insightsTitle:"Destek Kalite ve Duygu Skorları", auditView:"Analiz Detayı", overview:"Özet Görünüm", summaryCardTitle:"Düzenlenebilir Görüşme Özeti", summaryCardTag:"Asistan Taslağı · Düzenlenebilir", sentimentCardTitle:"Duygu Durumu", confidenceCardTitle:"Çözüm Güven Skoru", confidenceTag:"Analiz Skoru", qaCardTitle:"Temsilci Kalite Kartı", qaTag:"Yönetici Görünümü", timelineCardTitle:"Duygu Değişim Grafiği", topicsCardTitle:"Tespit Edilen Konular", topicsTag:"Açıklanabilir Analiz", reasoningCardTitle:"Analiz Gerekçesi", routingCardTitle:"Önerilen Öncelik", churnCardTitle:"Müşteri Kaybı Riski", riskTag:"Risk Göstergesi", businessValueTitle:"İş Değeri", expoTag:"Demo Anlatım Noktası", businessValueText:"Bu demo, yapay zekayı müşteri temsilcisinin yerine geçen bir yapı olarak değil, destek ekiplerini hızlandıran bir görüşme sonrası analiz asistanı olarak konumlandırır. Özet, kalite içgörüleri, CRM notları ve takip aksiyonu taslakları hazırlayarak operasyonel yükü azaltır.",
+        workflowEyebrow:"Takip İş Akışı", workflowTitle:"Önerilen Takip Aksiyonları", approveSuggestions:"Tüm Önerileri Onayla", copilotReady:"Asistan Hazır", copilotReadyText:"Takip önerileri temsilci veya yönetici incelemesi için hazır.", ticketDraft:"Ticket Taslağı", emailDraft:"E-posta Taslağı", crmDraft:"CRM Notu", selectDraft:"Hazırlanan çıktıyı görüntülemek için bir taslak seçin.", rejectSelected:"Seçileni Reddet", undoAction:"Son Aksiyonu Geri Al", resetActions:"Aksiyonları Sıfırla", compliance:"Uyum", confidence:"Güven", human:"İnsan", approval:"Onayı",
+        pitchTitle:"Demo Özeti", close:"Kapat", pitchBody:"<strong>Müşteri Hizmetleri Destek Asistanı, ekipler için görüşme sonrası analiz ve takip yardımcısıdır.</strong><br><br>Müşteriyle görüşmeyi müşteri hizmetleri temsilcisi yürütür. Görüşme tamamlandıktan sonra asistan konuşma metnini analiz eder, özet taslağı çıkarır, kalite ve risk göstergeleri üretir, ticket, e-posta ve CRM notu gibi takip önerileri hazırlar. Bu demoda hiçbir aksiyon otomatik uygulanmaz; temsilci veya yönetici her öneriyi onaylayabilir, reddedebilir, geri alabilir ya da sıfırlayabilir.",
+        labels:{customer:"Müşteri", representative:"Temsilci", ready:"Hazır", approved:"Onaylandı", rejected:"Reddedildi"}, logs:{language:"Dil Türkçe olarak güncellendi", loaded:"yüklendi", analysisStarted:"Yerel LLM analizi başladı", analysisCompleted:"Yerel LLM analizi tamamlandı", analysisFailed:"Yerel LLM analizi başarısız", suggestionApproved:"Onaylanan öneri", allApproved:"Tüm öneriler onaylandı", reset:"Demo sıfırlandı"}
+      }
+    };
+
+    const scenarios = {
+      billing: {
+        customer:"Sarah Johnson", avatar:"SJ", meta:"Customer · Subscription Plan · Billing Queue", risk:"P2 Risk", summary:"The customer reported a duplicate subscription charge. The representative confirmed the billing issue, promised a refund request and committed to sending confirmation. The customer’s sentiment recovered after resolution, but the next billing cycle must be reviewed to prevent recurrence.", sentiment:82, sentimentLabel:"Mostly positive", delta:"+14 pts<br>after resolution", confidence:96, compliance:"94%", modelConfidence:"89%", priority:"P2", priorityText:"Suggest routing to Billing Operations with SLA before the next renewal cycle.", churn:"Low", churnText:"Negative event exists, but customer loyalty signal reduces churn likelihood.", confidenceText:"High confidence that the customer issue was identified and mapped to correct follow-up suggestions.", reasoning:"1. Detected billing complaint from duplicate-charge sentence.<br>2. Detected customer frustration but also positive loyalty signal from “I like the service.”<br>3. Mapped representative promise to refund-ticket and confirmation-email drafts.<br>4. Mapped customer prevention request to billing-account review suggestion before next renewal.<br>5. Assigned P2 priority because financial impact exists but no immediate churn or escalation was expressed.",
+        transcript:[["rep","00:04","Hello, thank you for contacting support. How can I help you today?","Opening interaction. The representative sets a professional tone and invites the customer to explain the issue."],["customer issue","00:18","I was charged twice for my monthly subscription, and I need this corrected as soon as possible.","Primary issue detected: duplicate subscription charge. Urgency language indicates customer expects fast correction."],["rep","00:37","I understand. I will check your latest invoice and payment records right away.","Positive representative behavior: acknowledges the issue and explains immediate investigation step."],["customer issue","01:12","Thanks. I like the service, but this billing issue is frustrating.","Sentiment mixed: customer likes the service but expresses frustration. Churn risk remains low if resolved quickly."],["rep","02:45","I found the duplicate charge. I will create a refund request and send you a confirmation email.","Resolution promise detected: refund request plus confirmation email. This maps to suggested follow-up drafts."],["customer issue","03:08","Great, thank you. Please also make sure it does not happen again next month.","Prevention request detected. The copilot should suggest a billing account review before the next renewal."]],
+        metrics:[["Empathy",88],["Clarity",91],["Compliance",94],["Risk Control",76]], timeline:[42,35,48,56,69,78,82], topics:[["Billing","Billing is the dominant topic with duplicate charge language."],["Refund","Refund intent is explicit and should create a follow-up ticket draft."],["Frustration","Customer frustration is detected but balanced by positive service feedback."],["Prevention","Prevention request maps to billing account review suggestion before renewal."],["Low Churn Risk","Churn risk is low because the customer states they like the service."],["Compliant","Compliance risk is low because no sensitive authentication or forbidden promise appears."]],
+        previews:{ticket:"<strong>Suggested Ticket Draft</strong><br>Queue: Billing Operations<br>Priority: P2<br>Reason: Duplicate monthly subscription charge detected.<br>Recommended action: Validate payment record, process refund request and confirm before next renewal.",email:"<strong>Suggested Email Draft</strong><br>Hi Sarah, we identified the duplicate subscription charge and created a refund request. We also flagged your account for review before the next renewal to prevent recurrence.",crm:"<strong>Suggested CRM Note</strong><br>Customer reported duplicate billing. Sentiment was initially frustrated but recovered after representative confirmed refund action. Follow-up required before next renewal. Final sentiment: 82%."},
+        actions:[["Suggest Refund Ticket","Draft a ticket with duplicate charge evidence and transaction reference.","Refund ticket suggestion approved for Billing Operations."],["Draft Customer Email","Prepare refund confirmation message for representative review.","Customer email draft approved for review/send."],["Suggest Renewal Review","Recommend account check before the next subscription cycle.","Renewal review suggestion approved."],["Draft CRM Note","Prepare summary, sentiment score and action history.","CRM note draft approved."]]
+      },
+      retention: {
+        customer:"Michael Reed", avatar:"MR", meta:"Customer · Premium Plan · Retention Queue", risk:"High Risk", summary:"The customer expressed dissatisfaction with recent service value and mentioned considering cancellation. The representative acknowledged the concern, offered a retention review and proposed a tailored follow-up. Churn risk is elevated and requires fast supervisor review.", sentiment:46, sentimentLabel:"At risk", delta:"-21 pts<br>loyalty risk", confidence:87, compliance:"91%", modelConfidence:"86%", priority:"P1", priorityText:"Suggest routing to Retention Team with supervisor visibility within the same business day.", churn:"High", churnText:"Cancellation language and value dissatisfaction indicate elevated churn probability.", confidenceText:"Strong confidence that the customer showed churn intent and needs a supervised retention follow-up.", reasoning:"1. Detected cancellation intent from customer language.<br>2. Identified service-value dissatisfaction as the root cause.<br>3. Classified the case as P1 because churn language is explicit.<br>4. Suggested supervisor review and retention follow-up.<br>5. Prepared CRM note and callback task drafts for human approval.",
+        transcript:[["rep","00:03","Thanks for reaching out. What can I help you with today?","Standard representative greeting detected."],["customer issue","00:16","Honestly, I am not sure the premium plan is worth it anymore.","Value dissatisfaction detected. This is an early churn indicator."],["customer issue","00:39","If nothing changes, I may cancel before the next billing period.","Explicit cancellation intent detected. Priority should increase."],["rep","01:05","I understand your concern. Let me review your usage and available loyalty options.","Representative acknowledges concern and moves toward retention review."],["rep","02:20","I can request a retention review and have our team follow up with a tailored offer.","Retention follow-up promise detected."],["customer issue","02:58","Okay, but I need a clear answer soon.","Urgency detected; follow-up SLA is required."]],
+        metrics:[["Empathy",84],["Clarity",78],["Compliance",91],["Risk Control",82]], timeline:[58,44,38,42,49,46,50], topics:[["Churn","Explicit cancellation language has been detected."],["Value Concern","The customer questions the premium plan value."],["Retention Offer","A tailored offer is recommended for human review."],["Urgency","The customer expects a clear answer soon."],["Supervisor Review","Priority should be visible to a supervisor."]],
+        previews:{ticket:"<strong>Suggested Retention Case Draft</strong><br>Queue: Retention Team<br>Priority: P1<br>Reason: Explicit cancellation risk.<br>Recommended action: Review account value, usage and eligible retention options.",email:"<strong>Suggested Email Draft</strong><br>Hi Michael, our retention team is reviewing your account and available options. We will follow up with a clear recommendation shortly.",crm:"<strong>Suggested CRM Note</strong><br>Customer questioned premium plan value and mentioned possible cancellation. Churn risk high. Retention review and supervisor visibility recommended."},
+        actions:[["Suggest Retention Case","Draft P1 case for cancellation-risk review.","Retention case suggestion approved."],["Suggest Supervisor Alert","Prepare escalation note for retention supervisor.","Supervisor alert suggestion approved."],["Draft Follow-up Email","Prepare review and next-step timing message.","Retention email draft approved."],["Draft CRM Risk Note","Mark account as high churn risk.","CRM churn note draft approved."]]
+      },
+      technical: {
+        customer:"Aylin Carter", avatar:"AC", meta:"Customer · Enterprise Account · Technical Support", risk:"P1 Incident", summary:"The customer reported intermittent API failures affecting production integration. The representative gathered symptoms and proposed escalation to engineering. The case requires incident ticketing, technical owner assignment and status update communication.", sentiment:61, sentimentLabel:"Concerned", delta:"+6 pts<br>after escalation", confidence:92, compliance:"96%", modelConfidence:"91%", priority:"P1", priorityText:"Suggest creating a technical incident and assigning engineering owner immediately.", churn:"Medium", churnText:"Production impact exists, but customer is seeking resolution rather than cancellation.", confidenceText:"High confidence that this is a production-impact technical support case requiring escalation.", reasoning:"1. Detected production-impact technical failure.<br>2. Extracted API failure and intermittent behavior as main symptoms.<br>3. Classified as P1 incident because production integration is affected.<br>4. Suggested engineering escalation and customer status update.<br>5. Prepared incident, email and CRM artifact drafts for approval.",
+        transcript:[["rep","00:05","Hello, I see you contacted technical support. Can you describe the issue?","Technical intake started by representative."],["customer issue","00:21","Our production integration is getting intermittent API failures.","Production-impact incident detected."],["customer issue","00:44","It works for a few minutes and then fails again without a clear error.","Intermittent technical symptom extracted."],["rep","01:18","I will collect the timestamps and request logs for engineering review.","Representative follows appropriate technical triage process."],["rep","02:12","I am escalating this as a priority incident and will send you the ticket reference.","Escalation promise detected."],["customer issue","02:39","Please keep us updated. This affects our internal users.","Status-update requirement and business impact detected."]],
+        metrics:[["Empathy",79],["Clarity",86],["Compliance",96],["Risk Control",90]], timeline:[52,46,43,55,61,63,66], topics:[["API Failure","The dominant technical issue is intermittent API failure."],["Production Impact","Customer states the issue affects production integration."],["Engineering Escalation","Engineering review is required."],["Status Update","Customer expects ongoing communication."],["Incident","P1 incident routing is recommended."]],
+        previews:{ticket:"<strong>Suggested Incident Draft</strong><br>Queue: Engineering Support<br>Priority: P1<br>Reason: Intermittent API failures in production.<br>Recommended action: Assign owner, request logs and publish status update.",email:"<strong>Suggested Email Draft</strong><br>Hi Aylin, we escalated your API issue as a priority incident. Our engineering team will review the provided timestamps and logs, and we will keep you updated.",crm:"<strong>Suggested CRM Note</strong><br>Enterprise customer reported intermittent API failures affecting production integration. P1 incident and engineering escalation recommended."},
+        actions:[["Suggest Incident Ticket","Draft P1 engineering incident.","Incident ticket suggestion approved."],["Suggest Technical Owner","Recommend engineering support owner assignment.","Technical owner suggestion approved."],["Draft Status Email","Prepare incident reference and next steps.","Status email draft approved."],["Draft CRM Incident Note","Record production impact and escalation.","CRM incident note draft approved."]]
+      }
+    };
+
+
+    const scenariosTr = {
+      billing: {
+        customer:"Sarah Johnson", avatar:"SJ", meta:"Müşteri · Abonelik Paketi · Faturalama Kuyruğu", risk:"P2 Risk",
+        summary:"Müşteri, aylık abonelik ücretinin iki kez tahsil edildiğini bildirdi. Temsilci faturalama problemini doğruladı, iade talebi oluşturacağını ve müşteriye bilgilendirme e-postası göndereceğini belirtti. Görüşme sonunda müşteri duygu durumu toparlandı; ancak tekrar yaşanmaması için bir sonraki fatura dönemi öncesinde hesap kontrolü önerildi.",
+        sentiment:82, sentimentLabel:"Büyük ölçüde olumlu", delta:"+14 puan<br>çözüm sonrası toparlandı", confidence:96, compliance:"94%", modelConfidence:"89%", priority:"P2",
+        priorityText:"Faturalama operasyon ekibine yönlendirme ve bir sonraki yenileme dönemi öncesinde kontrol önerilir.", churn:"Düşük", churnText:"Olumsuz deneyim mevcut; ancak müşterinin hizmetten memnun olduğunu belirtmesi müşteri kaybı riskini azaltıyor.",
+        confidenceText:"Müşteri probleminin doğru tespit edildiği ve uygun takip aksiyonlarına bağlandığına dair yüksek güven var.",
+        reasoning:"1. Çift tahsilat ifadesinden faturalama problemi tespit edildi.<br>2. Müşteri memnuniyetsizliği görüldü; ancak hizmetten memnun olduğunu belirtmesi olumlu sinyal olarak değerlendirildi.<br>3. Temsilcinin iade ve bilgilendirme e-postası taahhüdü takip aksiyonlarına dönüştürüldü.<br>4. Tekrar yaşanmaması talebi, bir sonraki yenileme öncesi hesap kontrolü önerisine bağlandı.<br>5. Finansal etki olduğu için P2 öncelik verildi; acil iptal veya kriz sinyali görülmedi.",
+        transcript:[
+          ["rep","00:04","Merhaba, desteğe ulaştığınız için teşekkür ederim. Size nasıl yardımcı olabilirim?","Temsilci profesyonel bir açılış yaptı ve müşterinin problemi açıklamasını sağladı."],
+          ["customer issue","00:18","Aylık abonelik ücretim iki kez tahsil edilmiş. Bunun mümkün olan en kısa sürede düzeltilmesini istiyorum.","Ana problem tespit edildi: çift abonelik tahsilatı. Müşteri hızlı çözüm bekliyor."],
+          ["rep","00:37","Anlıyorum. Son faturanızı ve ödeme kayıtlarınızı hemen kontrol edeceğim.","Temsilci problemi kabul etti ve net bir inceleme adımı paylaştı."],
+          ["customer issue","01:12","Teşekkürler. Hizmeti seviyorum ama bu faturalama sorunu gerçekten can sıkıcı.","Duygu durumu karışık: müşteri hizmetten memnun ama faturalama nedeniyle rahatsız."],
+          ["rep","02:45","Çift tahsilatı gördüm. İade talebi oluşturacağım ve size bir onay e-postası göndereceğim.","Çözüm taahhüdü tespit edildi: iade talebi ve bilgilendirme e-postası."],
+          ["customer issue","03:08","Harika, teşekkürler. Lütfen bunun gelecek ay tekrar yaşanmadığından da emin olun.","Tekrar yaşanmaması talebi tespit edildi. Hesap kontrolü önerisi oluşturulmalı."]
+        ],
+        metrics:[["Empati",88],["Netlik",91],["Uyum",94],["Risk Kontrolü",76]], timeline:[42,35,48,56,69,78,82],
+        topics:[["Faturalama","Çift tahsilat ifadesi nedeniyle ana konu faturalama olarak belirlendi."],["İade","Müşteri iade beklentisi taşıyor; takip ticket taslağı önerilmeli."],["Memnuniyetsizlik","Müşteri faturalama probleminden dolayı rahatsızlık belirtti."],["Tekrarı Önleme","Müşteri aynı problemin gelecek ay tekrar yaşanmamasını istedi."],["Düşük Kayıp Riski","Müşteri hizmetten memnun olduğunu belirttiği için müşteri kaybı riski düşük."],["Uyumlu Görüşme","Hassas veri paylaşımı veya politika dışı vaat görünmediği için uyum riski düşük."]],
+        previews:{
+          ticket:"<strong>Önerilen Ticket Taslağı</strong><br>Kuyruk: Faturalama Operasyonları<br>Öncelik: P2<br>Neden: Aylık abonelik ücretinin iki kez tahsil edilmesi.<br>Önerilen aksiyon: Ödeme kaydını doğrula, iade talebini işle ve bir sonraki yenileme öncesi hesabı kontrol et.",
+          email:"<strong>Önerilen E-posta Taslağı</strong><br>Merhaba Sarah, çift abonelik tahsilatını tespit ettik ve iade talebinizi oluşturduk. Tekrar yaşanmaması için hesabınızı bir sonraki yenileme öncesinde kontrol edilmek üzere işaretledik.",
+          crm:"<strong>Önerilen CRM Notu</strong><br>Müşteri çift faturalama problemi bildirdi. Görüşme başında memnuniyetsizlik vardı; temsilcinin iade aksiyonunu doğrulamasından sonra duygu durumu toparlandı. Bir sonraki yenileme öncesi takip gerekiyor. Son duygu skoru: %82."
+        },
+        actions:[["İade Ticket Taslağı Hazırla","Çift tahsilat kanıtı ve ödeme referansı ile ticket taslağı oluştur.","İade ticket önerisi faturalama operasyonları için onaylandı."],["Müşteri E-postası Hazırla","Temsilci incelemesi için iade bilgilendirme e-postası hazırla.","Müşteri e-postası taslağı onaylandı."],["Yenileme Öncesi Kontrol Öner","Bir sonraki abonelik döneminden önce hesap kontrolü öner.","Yenileme öncesi kontrol önerisi onaylandı."],["CRM Notu Hazırla","Özet, duygu skoru ve takip aksiyonlarını CRM notuna dönüştür.","CRM notu taslağı onaylandı."]]
+      },
+      retention: {
+        customer:"Michael Reed", avatar:"MR", meta:"Müşteri · Premium Paket · Elde Tutma Kuyruğu", risk:"Yüksek Risk",
+        summary:"Müşteri, premium paketin değerinden memnun olmadığını ve iptal etmeyi değerlendirdiğini belirtti. Temsilci endişeyi kabul etti, kullanım ve elde tutma seçeneklerinin inceleneceğini söyledi. Müşteri kaybı riski yüksek olduğu için hızlı yönetici görünürlüğü ve elde tutma aksiyonu önerilir.",
+        sentiment:46, sentimentLabel:"Riskli", delta:"-21 puan<br>müşteri kaybı riski", confidence:87, compliance:"91%", modelConfidence:"86%", priority:"P1",
+        priorityText:"Aynı iş günü içinde elde tutma ekibine ve yönetici görünürlüğüne yönlendirme önerilir.", churn:"Yüksek", churnText:"İptal ifadesi ve değer memnuniyetsizliği müşteri kaybı riskini artırıyor.",
+        confidenceText:"Müşterinin iptal eğilimi gösterdiği ve kontrollü bir elde tutma takibine ihtiyaç olduğu yönünde güçlü güven var.",
+        reasoning:"1. Müşterinin iptal ifadesi müşteri kaybı sinyali olarak tespit edildi.<br>2. Temel neden, premium paketin değer algısının düşük olması olarak sınıflandırıldı.<br>3. Açık iptal sinyali nedeniyle P1 öncelik verildi.<br>4. Yönetici görünürlüğü ve elde tutma takibi önerildi.<br>5. CRM notu ve geri dönüş görevi taslakları insan onayı için hazırlandı.",
+        transcript:[
+          ["rep","00:03","Bize ulaştığınız için teşekkür ederim. Size nasıl yardımcı olabilirim?","Standart temsilci açılışı tespit edildi."],
+          ["customer issue","00:16","Açıkçası premium paketin artık buna değdiğinden emin değilim.","Değer memnuniyetsizliği tespit edildi. Bu erken müşteri kaybı göstergesidir."],
+          ["customer issue","00:39","Bir şey değişmezse bir sonraki fatura döneminden önce iptal edebilirim.","Açık iptal niyeti tespit edildi. Öncelik artırılmalı."],
+          ["rep","01:05","Endişenizi anlıyorum. Kullanımınızı ve uygun sadakat seçeneklerini inceleyeyim.","Temsilci endişeyi kabul etti ve elde tutma incelemesine geçti."],
+          ["rep","02:20","Elde tutma incelemesi talep edebilirim ve ekibimizin size özel bir seçenekle dönüş yapmasını sağlayabilirim.","Elde tutma takibi taahhüdü tespit edildi."],
+          ["customer issue","02:58","Tamam ama kısa sürede net bir cevap almam gerekiyor.","Aciliyet tespit edildi; takip SLA'i gerekiyor."]
+        ],
+        metrics:[["Empati",84],["Netlik",78],["Uyum",91],["Risk Kontrolü",82]], timeline:[58,44,38,42,49,46,50],
+        topics:[["Müşteri Kaybı Riski","Açık iptal ifadesi tespit edildi."],["Değer Endişesi","Müşteri premium paketin değerini sorguluyor."],["Elde Tutma Teklifi","İnsan onayına sunulacak kişiselleştirilmiş teklif önerilir."],["Aciliyet","Müşteri kısa sürede net cevap bekliyor."],["Yönetici Görünürlüğü","Öncelik yöneticinin görebileceği şekilde işaretlenmeli."]],
+        previews:{
+          ticket:"<strong>Önerilen Elde Tutma Case Taslağı</strong><br>Kuyruk: Müşteri Elde Tutma Ekibi<br>Öncelik: P1<br>Neden: Açık iptal riski.<br>Önerilen aksiyon: Hesap değeri, kullanım ve uygun elde tutma seçeneklerini incele.",
+          email:"<strong>Önerilen E-posta Taslağı</strong><br>Merhaba Michael, hesabınızı ve size uygun seçenekleri inceliyoruz. En kısa sürede net bir öneriyle size dönüş yapacağız.",
+          crm:"<strong>Önerilen CRM Notu</strong><br>Müşteri premium paket değerini sorguladı ve iptal ihtimalinden bahsetti. Müşteri kaybı riski yüksek. Elde tutma incelemesi ve yönetici görünürlüğü önerilir."
+        },
+        actions:[["Elde Tutma İncelemesini Hızlandır","Zamanında dönüş sağlamak için talebi elde tutma ekibine yönlendir.","Elde tutma inceleme önerisi onaylandı."],["Kullanım Verisini Analiz Et","Paket değerini göstermek veya daha uygun paket önermek için kullanım verisini incele.","Kullanım analizi önerisi onaylandı."],["Kişiye Özel Teklif Hazırla","Müşteri kullanımına göre indirim veya ek özellik önerisi geliştir.","Kişiye özel teklif önerisi onaylandı."],["Takip İletişimi Hazırla","Beklentiyi yönetmek için zaman planı içeren bilgilendirme e-postası hazırla.","Takip iletişimi önerisi onaylandı."]]
+      },
+      technical: {
+        customer:"Aylin Carter", avatar:"AC", meta:"Müşteri · Kurumsal Hesap · Teknik Destek", risk:"P1 Olay",
+        summary:"Müşteri, canlı ortam entegrasyonunu etkileyen aralıklı API hataları bildirdi. Temsilci belirtileri topladı ve mühendislik ekibine eskalasyon önerdi. Case için olay ticket'ı, teknik sorumlu atanması ve düzenli durum bilgilendirmesi önerilir.",
+        sentiment:61, sentimentLabel:"Endişeli", delta:"+6 puan<br>eskalasyon sonrası", confidence:92, compliance:"96%", modelConfidence:"91%", priority:"P1",
+        priorityText:"Teknik olay kaydı oluşturulması ve mühendislik sorumlusu atanması önerilir.", churn:"Orta", churnText:"Canlı ortam etkisi var; ancak müşteri iptal değil çözüm bekliyor.",
+        confidenceText:"Bu görüşmenin canlı ortamı etkileyen teknik destek vakası olduğu ve eskalasyon gerektirdiği yönünde yüksek güven var.",
+        reasoning:"1. Canlı ortamı etkileyen teknik hata tespit edildi.<br>2. API hatası ve aralıklı davranış ana belirti olarak çıkarıldı.<br>3. Entegrasyon canlı ortamı etkilediği için P1 olay olarak sınıflandırıldı.<br>4. Mühendislik eskalasyonu ve müşteri durum bilgilendirmesi önerildi.<br>5. Olay, e-posta ve CRM taslakları onay için hazırlandı.",
+        transcript:[
+          ["rep","00:05","Merhaba, teknik destekle iletişime geçtiğinizi görüyorum. Sorunu anlatabilir misiniz?","Temsilci teknik ön incelemeyi başlattı."],
+          ["customer issue","00:21","Canlı ortam entegrasyonumuzda aralıklı API hataları alıyoruz.","Canlı ortam etkisi olan olay tespit edildi."],
+          ["customer issue","00:44","Birkaç dakika çalışıyor, sonra belirgin bir hata olmadan tekrar bozuluyor.","Aralıklı teknik belirti çıkarıldı."],
+          ["rep","01:18","Mühendislik incelemesi için zaman damgalarını ve logları toplayacağım.","Temsilci doğru teknik ön inceleme sürecini izliyor."],
+          ["rep","02:12","Bunu öncelikli bir olay olarak eskale ediyorum ve size ticket referansını göndereceğim.","Eskalasyon taahhüdü tespit edildi."],
+          ["customer issue","02:39","Lütfen bizi güncel tutun. Bu durum iç kullanıcılarımızı etkiliyor.","Durum bilgilendirme gereksinimi ve iş etkisi tespit edildi."]
+        ],
+        metrics:[["Empati",79],["Netlik",86],["Uyum",96],["Risk Kontrolü",90]], timeline:[52,46,43,55,61,63,66],
+        topics:[["API Hatası","Ana teknik problem aralıklı API hatasıdır."],["Canlı Ortam Etkisi","Müşteri sorunun canlı ortam entegrasyonunu etkilediğini belirtti."],["Mühendislik Eskalasyonu","Mühendislik incelemesi gerekiyor."],["Durum Bilgilendirmesi","Müşteri düzenli güncelleme bekliyor."],["Olay Kaydı","P1 olay yönlendirmesi önerilir."]],
+        previews:{
+          ticket:"<strong>Önerilen Olay Ticket Taslağı</strong><br>Kuyruk: Mühendislik Destek<br>Öncelik: P1<br>Neden: Canlı ortamda aralıklı API hataları.<br>Önerilen aksiyon: Sorumlu ata, logları incele ve durum güncellemesi paylaş.",
+          email:"<strong>Önerilen E-posta Taslağı</strong><br>Merhaba Aylin, API probleminizi öncelikli olay olarak eskale ettik. Mühendislik ekibimiz zaman damgalarını ve logları inceleyecek; sizi gelişmeler hakkında bilgilendireceğiz.",
+          crm:"<strong>Önerilen CRM Notu</strong><br>Kurumsal müşteri canlı ortam entegrasyonunu etkileyen aralıklı API hataları bildirdi. P1 olay kaydı ve mühendislik eskalasyonu önerilir."
+        },
+        actions:[["Olay Ticket Taslağı Hazırla","Mühendislik ekibi için P1 olay kaydı taslağı oluştur.","Olay ticket önerisi onaylandı."],["Teknik Sorumlu Öner","Mühendislik destek sorumlusu atanmasını öner.","Teknik sorumlu önerisi onaylandı."],["Durum E-postası Hazırla","Olay referansı ve sonraki adımları içeren e-posta hazırla.","Durum e-postası taslağı onaylandı."],["CRM Olay Notu Hazırla","Canlı ortam etkisini ve eskalasyonu CRM'e kaydet.","CRM olay notu taslağı onaylandı."]]
+      }
+    };
+
+
+    let currentScenario="billing", currentLanguage="en", actionHistory=[], selectedActionIndex=null, activeFilter="all";
+    const $=(id)=>document.getElementById(id);
+    const scenarioSelect=$("scenarioSelect"), languageSelect=$("languageSelect"), transcriptList=$("transcriptList"), extractBox=$("extractBox"), summaryText=$("summaryText"), sentimentScore=$("sentimentScore"), sentimentLabel=$("sentimentLabel"), sentimentDelta=$("sentimentDelta"), sentimentFill=$("sentimentFill"), confidenceGauge=$("confidenceGauge"), confidenceScore=$("confidenceScore"), confidenceText=$("confidenceText"), qualityMetrics=$("qualityMetrics"), timeline=$("timeline"), topicCloud=$("topicCloud"), reasoningTrace=$("reasoningTrace"), priorityScore=$("priorityScore"), priorityText=$("priorityText"), churnScore=$("churnScore"), churnText=$("churnText"), complianceScore=$("complianceScore"), modelConfidence=$("modelConfidence"), suggestionFlow=$("suggestionFlow"), output=$("output"), activityLog=$("activityLog"), toast=$("toast"), copilotTitle=$("copilotTitle"), copilotCopy=$("copilotCopy"), overview=$("overview"), detail=$("detail"), avatar=$("avatar"), customerName=$("customerName"), customerMeta=$("customerMeta"), riskBadge=$("riskBadge");
+    const tabs=document.querySelectorAll(".tab"), storySteps=document.querySelectorAll(".story-step"), previewButtons=document.querySelectorAll(".preview-btn");
+    function t(){return translations[currentLanguage]} function nowTime(){return new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"})} function addLog(text){const line=document.createElement("div");line.className="log-line";line.innerHTML=`<span class="log-time">${nowTime()}</span><span>${text}</span>`;activityLog.prepend(line)} function showToast(message){toast.textContent=message;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),1700)} function getScenario(){return scenarios[currentScenario]}
+
+    function applyLanguage(lang){
+      currentLanguage=lang;const tr=t();document.documentElement.lang=lang;
+      $("heroEyebrow").textContent=tr.heroEyebrow;$("pageTitle").textContent=tr.pageTitle;$("pageSubtitle").textContent=tr.pageSubtitle;Array.from(scenarioSelect.options).forEach((opt,idx)=>opt.textContent=tr.scenarioOptions[idx]);
+      $("openPitch").textContent=tr.pitch;$("undoBtn").textContent=tr.undoLast;$("resetBtn").textContent=tr.reset;$("runDemo").textContent=tr.analyzeCall;$("onlineStatus").textContent=tr.online;
+      storySteps.forEach((step,idx)=>{const data=tr.story[idx];step.querySelector(".step-num").textContent=data[0];step.querySelector(".step-title").textContent=data[1];step.querySelector(".step-desc").textContent=data[2]});
+      $("conversationEyebrow").textContent=tr.conversationEyebrow;$("transcriptTitle").textContent=tr.transcriptTitle;$("tabAll").textContent=tr.tabAll;$("tabCustomer").textContent=tr.tabCustomer;$("tabIssues").textContent=tr.tabIssues;$("flagIssue").textContent=tr.flagIssue;$("clearFlags").textContent=tr.clearFlags;$("copySummary").textContent=tr.copySummary;
+      $("intelligenceEyebrow").textContent=tr.intelligenceEyebrow;$("insightsTitle").textContent=tr.insightsTitle;$("switchInsights").textContent=detail.classList.contains("hidden")?tr.auditView:tr.overview;$("summaryCardTitle").textContent=tr.summaryCardTitle;$("summaryCardTag").textContent=tr.summaryCardTag;$("sentimentCardTitle").textContent=tr.sentimentCardTitle;$("confidenceCardTitle").textContent=tr.confidenceCardTitle;$("confidenceTag").textContent=tr.confidenceTag;$("qaCardTitle").textContent=tr.qaCardTitle;$("qaTag").textContent=tr.qaTag;$("timelineCardTitle").textContent=tr.timelineCardTitle;$("topicsCardTitle").textContent=tr.topicsCardTitle;$("topicsTag").textContent=tr.topicsTag;$("reasoningCardTitle").textContent=tr.reasoningCardTitle;$("routingCardTitle").textContent=tr.routingCardTitle;$("churnCardTitle").textContent=tr.churnCardTitle;$("riskTag").textContent=tr.riskTag;$("businessValueTitle").textContent=tr.businessValueTitle;$("expoTag").textContent=tr.expoTag;$("businessValueText").textContent=tr.businessValueText;
+      $("workflowEyebrow").textContent=tr.workflowEyebrow;$("workflowTitle").textContent=tr.workflowTitle;$("approveAll").textContent=tr.approveSuggestions;$("ticketDraftBtn").textContent=tr.ticketDraft;$("emailDraftBtn").textContent=tr.emailDraft;$("crmDraftBtn").textContent=tr.crmDraft;$("rejectSelected").textContent=tr.rejectSelected;$("undoAction").textContent=tr.undoAction;$("resetActions").textContent=tr.resetActions;$("complianceLabel").textContent=tr.compliance;$("confidenceLabel").textContent=tr.confidence;$("humanValue").textContent=tr.human;$("approvalLabel").textContent=tr.approval;
+      $("pitchTitle").textContent=tr.pitchTitle;$("closeModal").textContent=tr.close;$("pitchBody").innerHTML=tr.pitchBody;
+      if(copilotTitle.textContent.includes("Ready")||copilotTitle.textContent.includes("Hazır")){copilotTitle.textContent=tr.copilotReady;copilotCopy.textContent=tr.copilotReadyText}
+      if(!output.innerHTML.includes("<strong>")) output.textContent=tr.selectDraft;
+      addLog(tr.logs.language);
+    }
+
+    function renderTranscript(){const s=getScenario(),tr=t();transcriptList.innerHTML="";s.transcript.forEach((row,index)=>{const[type,time,text,note]=row;const speaker=type.includes("customer")?tr.labels.customer:tr.labels.representative;const div=document.createElement("div");div.className=`message ${type.includes("customer")?"customer":"rep"} ${type.includes("issue")?"issue":""}`;div.dataset.type=type;div.dataset.note=note;div.dataset.index=index;div.innerHTML=`<div class="role"><span>${speaker}</span><span>${time}</span></div>${text}`;div.addEventListener("click",()=>{document.querySelectorAll(".message").forEach(m=>m.classList.remove("selected"));div.classList.add("selected");extractBox.innerHTML=currentLanguage === "tr" ? `<strong>Asistan Açıklaması:</strong> ${note}` : `<strong>Assistant Explanation:</strong> ${note}`;addLog(`Transcript inspected: ${speaker} ${time}`)});transcriptList.appendChild(div)});applyFilter(activeFilter)}
+    function renderMetrics(){const s=getScenario();qualityMetrics.innerHTML="";s.metrics.forEach(([name,value])=>{qualityMetrics.innerHTML+=`<div class="metric-row"><span>${name}</span><div class="bar-track"><div class="bar-fill" style="--w:${value}%"></div></div><strong>${value}</strong></div>`});timeline.innerHTML="";s.timeline.forEach((value,index)=>{const bar=document.createElement("div");bar.className="tbar";bar.style.setProperty("--h",`${value}%`);bar.innerHTML=`<span>${value}</span>`;bar.addEventListener("click",()=>{extractBox.innerHTML=currentLanguage === "tr" ? `<strong>Zaman noktası ${index+1}:</strong> Duygu skoru ${value}.` : `<strong>Timeline point ${index+1}:</strong> Sentiment score was ${value}.`;addLog(`Sentiment point ${index+1} inspected`)});timeline.appendChild(bar)})}
+    function renderTopics(){const s=getScenario();topicCloud.innerHTML="";s.topics.forEach(([name,explanation])=>{const btn=document.createElement("button");btn.className="topic";btn.textContent=name;btn.addEventListener("click",()=>{document.querySelectorAll(".topic").forEach(t=>t.classList.remove("active"));btn.classList.add("active");extractBox.innerHTML=`<strong>${name}:</strong> ${explanation}`;addLog(`Topic explained: ${name}`);showToast(`${name} explained`)});topicCloud.appendChild(btn)})}
+    function renderActions(){const s=getScenario(),tr=t();suggestionFlow.innerHTML="";s.actions.forEach(([title,desc,approvedMessage],index)=>{const item=document.createElement("div");item.className="flow-item";item.dataset.index=index;item.dataset.action=approvedMessage;item.innerHTML=`<div class="flow-index">${index+1}</div><div><div class="flow-title">${title}</div><div class="flow-desc">${desc}</div></div><div class="flow-state">${tr.labels.ready}</div>`;item.addEventListener("click",()=>approveAction(index));suggestionFlow.appendChild(item)})}
+    function applyScenario(){const s=getScenario(),tr=t();avatar.textContent=s.avatar;customerName.textContent=s.customer;customerMeta.textContent=s.meta;riskBadge.textContent=s.risk;summaryText.textContent=s.summary;sentimentScore.textContent=`${s.sentiment}%`;sentimentLabel.textContent=s.sentimentLabel;sentimentDelta.innerHTML=s.delta;sentimentFill.style.width=`${s.sentiment}%`;confidenceScore.textContent=s.confidence;confidenceGauge.style.background=`conic-gradient(var(--green) 0 ${s.confidence}%, rgba(148,163,184,.16) ${s.confidence}% 100%)`;confidenceText.textContent=s.confidenceText;reasoningTrace.innerHTML=s.reasoning;priorityScore.textContent=s.priority;priorityText.textContent=s.priorityText;churnScore.textContent=s.churn;churnText.textContent=s.churnText;complianceScore.textContent=s.compliance;modelConfidence.textContent=s.modelConfidence;renderTranscript();renderMetrics();renderTopics();renderActions();output.textContent=tr.selectDraft;previewButtons.forEach(btn=>btn.classList.remove("active"));selectedActionIndex=null;actionHistory=[];activityLog.innerHTML="";addLog(`${scenarioSelect.options[scenarioSelect.selectedIndex].text} ${tr.logs.loaded}`);copilotTitle.textContent=tr.copilotReady;copilotCopy.textContent=tr.copilotReadyText;extractBox.textContent=tr.defaultExtract}
+    function applyFilter(filter){activeFilter=filter;document.querySelectorAll(".message").forEach(message=>{const type=message.dataset.type;message.style.display=(filter==="all"||type.includes(filter))?"block":"none"})}
+    function actionElement(index){return suggestionFlow.querySelector(`[data-index="${index}"]`)}
+    function approveAction(index){const item=actionElement(index);if(!item)return;const tr=t();const previous=item.classList.contains("done")?"done":item.classList.contains("rejected")?"rejected":"ready";selectedActionIndex=index;item.classList.remove("rejected");item.classList.add("done");item.querySelector(".flow-index").textContent="✓";item.querySelector(".flow-state").textContent=tr.labels.approved;actionHistory.push({type:"action-state",index,previous,next:"done"});copilotTitle.textContent=tr.labels.approved;copilotCopy.textContent=item.dataset.action;showToast(item.dataset.action);addLog(`${tr.logs.suggestionApproved}: ${item.querySelector(".flow-title").textContent}`)}
+    function rejectAction(index){const item=actionElement(index);if(!item)return;const tr=t();const previous=item.classList.contains("done")?"done":item.classList.contains("rejected")?"rejected":"ready";selectedActionIndex=index;item.classList.remove("done");item.classList.add("rejected");item.querySelector(".flow-index").textContent="×";item.querySelector(".flow-state").textContent=tr.labels.rejected;actionHistory.push({type:"action-state",index,previous,next:"rejected"});copilotTitle.textContent=tr.labels.rejected;copilotCopy.textContent=tr.rejectSelected;showToast(tr.rejectSelected);addLog(`${tr.rejectSelected}: ${item.querySelector(".flow-title").textContent}`)}
+    function setActionState(index,state){const item=actionElement(index);if(!item)return;const tr=t();item.classList.remove("done","rejected");if(state==="done"){item.classList.add("done");item.querySelector(".flow-index").textContent="✓";item.querySelector(".flow-state").textContent=tr.labels.approved}else if(state==="rejected"){item.classList.add("rejected");item.querySelector(".flow-index").textContent="×";item.querySelector(".flow-state").textContent=tr.labels.rejected}else{item.querySelector(".flow-index").textContent=Number(index)+1;item.querySelector(".flow-state").textContent=tr.labels.ready}}
+    function undoLast(){const last=actionHistory.pop();if(!last){showToast(currentLanguage === "tr" ? "Geri alınacak işlem yok" : "Nothing to undo");return}if(last.type==="action-state"){setActionState(last.index,last.previous);addLog(`Undo suggestion state for item ${Number(last.index)+1}`);showToast("Last action reverted")}else if(last.type==="flag"){document.querySelectorAll(".message.flagged").forEach(m=>m.classList.remove("flagged"));addLog(currentLanguage === "tr" ? "Riskli ifade işaretleme geri alındı" : "Issue flagging reverted");showToast("Flags reverted")}else if(last.type==="approve-all"){last.previousStates.forEach((state,index)=>setActionState(index,state));addLog(currentLanguage === "tr" ? "Önerileri onaylama işlemi geri alındı" : "Approve Suggestions reverted");showToast("Approve Suggestions reverted")}}
+
+    tabs.forEach(tab=>tab.addEventListener("click",()=>{tabs.forEach(t=>t.classList.remove("active"));tab.classList.add("active");applyFilter(tab.dataset.filter);extractBox.innerHTML=currentLanguage === "tr" ? `<strong>Görüşme Filtresi:</strong> ${tab.textContent} görünümü seçildi.` : `<strong>Transcript Filter:</strong> ${tab.textContent} view selected.`;addLog(`Transcript filter applied: ${tab.textContent}`);showToast(`${tab.textContent} view selected`)}));
+    storySteps.forEach((step,idx)=>step.addEventListener("click",()=>{storySteps.forEach(s=>s.classList.remove("active"));step.classList.add("active");const data=t().story[idx];extractBox.innerHTML=`<strong>${data[1]}:</strong> ${data[3]}`;addLog(`Story step inspected: ${data[1]}`)}));
+    previewButtons.forEach(button=>button.addEventListener("click",()=>{previewButtons.forEach(btn=>btn.classList.remove("active"));button.classList.add("active");output.innerHTML=getScenario().previews[button.dataset.preview];addLog(`Preview opened: ${button.textContent}`);showToast(`${button.textContent} opened`)}));
+    $("approveAll").addEventListener("click",()=>{const tr=t();const previousStates=Array.from(suggestionFlow.children).map(item=>item.classList.contains("done")?"done":item.classList.contains("rejected")?"rejected":"ready");actionHistory.push({type:"approve-all",previousStates});Array.from(suggestionFlow.children).forEach((_,index)=>setActionState(index,"done"));copilotTitle.textContent=tr.approveSuggestions;copilotCopy.textContent=tr.logs.allApproved;addLog(tr.logs.allApproved);showToast(tr.logs.allApproved)});
+    $("rejectSelected").addEventListener("click",()=>{if(selectedActionIndex===null){showToast(currentLanguage === "tr" ? "Önce bir öneri seçin" : "Select a suggestion first");return}rejectAction(selectedActionIndex)});
+    $("undoAction").addEventListener("click",undoLast);$("undoBtn").addEventListener("click",undoLast);
+    $("resetActions").addEventListener("click",()=>{Array.from(suggestionFlow.children).forEach((_,index)=>setActionState(index,"ready"));selectedActionIndex=null;addLog(currentLanguage === "tr" ? "Takip aksiyonları sıfırlandı" : "Suggestion workflow reset");showToast(currentLanguage === "tr" ? "Aksiyonlar sıfırlandı" : "Suggestions reset");copilotTitle.textContent=t().copilotReady;copilotCopy.textContent=t().copilotReadyText});
+    $("resetBtn").addEventListener("click",()=>{applyScenario();storySteps.forEach((s,i)=>{s.classList.remove("active","done");if(i===0)s.classList.add("active")});showToast(t().logs.reset)});
+    $("runDemo").addEventListener("click",async()=>{const tr=t();copilotTitle.textContent=tr.analyzeCall;copilotCopy.textContent=currentLanguage==="tr"?"Görüşme metni yerel LLM'e gönderiliyor...":"Sending transcript to local LLM for post-call analysis...";addLog(tr.logs.analysisStarted);showToast(tr.logs.analysisStarted);const transcript=getScenario().transcript.map(row=>{const[type,time,text]=row;return{speaker:type.includes("customer")?"Customer":"Representative",time,text}});try{const response=await fetch("/api/analyze-call",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({scenario:scenarioSelect.value,language:currentLanguage,transcript})});if(!response.ok){const errorBody=await response.json().catch(()=>({}));const message=errorBody.detail?.message||errorBody.detail||"Backend analysis request failed";throw new Error(typeof message==="string"?message:JSON.stringify(message))}const result=await response.json();summaryText.textContent=result.summary||summaryText.textContent;const sentiment=Number(result.sentiment_score||0);sentimentScore.textContent=`${sentiment}%`;sentimentLabel.textContent=result.sentiment_label||"Analyzed";sentimentDelta.innerHTML=result.sentiment_delta||"Local LLM generated";sentimentFill.style.width=`${sentiment}%`;const confidence=Number(result.resolution_confidence||0);confidenceScore.textContent=confidence;confidenceGauge.style.background=`conic-gradient(var(--green) 0 ${confidence}%, rgba(148,163,184,.16) ${confidence}% 100%)`;priorityScore.textContent=result.priority||"-";priorityText.textContent=result.priority_reason||"-";churnScore.textContent=result.churn_signal||"-";churnText.textContent=result.churn_reason||"-";if(result.quality_scores){const qs=result.quality_scores;qualityMetrics.innerHTML=`<div class="metric-row"><span>${currentLanguage==="tr"?"Empati":"Empathy"}</span><div class="bar-track"><div class="bar-fill" style="--w:${qs.empathy||0}%"></div></div><strong>${qs.empathy||0}</strong></div><div class="metric-row"><span>${currentLanguage==="tr"?"Netlik":"Clarity"}</span><div class="bar-track"><div class="bar-fill" style="--w:${qs.clarity||0}%"></div></div><strong>${qs.clarity||0}</strong></div><div class="metric-row"><span>${currentLanguage==="tr"?"Uyum":"Compliance"}</span><div class="bar-track"><div class="bar-fill" style="--w:${qs.compliance||0}%"></div></div><strong>${qs.compliance||0}</strong></div><div class="metric-row"><span>${currentLanguage==="tr"?"Risk Kontrolü":"Risk Control"}</span><div class="bar-track"><div class="bar-fill" style="--w:${qs.risk_control||0}%"></div></div><strong>${qs.risk_control||0}</strong></div>`}if(Array.isArray(result.topics)){topicCloud.innerHTML="";result.topics.forEach(topic=>{const btn=document.createElement("button");btn.className="topic";btn.textContent=topic.name||"Topic";btn.addEventListener("click",()=>{document.querySelectorAll(".topic").forEach(t=>t.classList.remove("active"));btn.classList.add("active");extractBox.innerHTML=`<strong>${topic.name||"Topic"}:</strong> ${topic.explanation||"-"}`;addLog(`Local LLM topic explained: ${topic.name||"Topic"}`);showToast(`${topic.name||"Topic"} explained`)});topicCloud.appendChild(btn)})}if(Array.isArray(result.suggested_actions)){suggestionFlow.innerHTML="";result.suggested_actions.forEach((action,index)=>{const item=document.createElement("div");item.className="flow-item";item.dataset.index=index;item.dataset.action=`${action.title||"Suggestion"} approved.`;item.innerHTML=`<div class="flow-index">${index+1}</div><div><div class="flow-title">${action.title||"Suggested Action"}</div><div class="flow-desc">${action.description||"-"}</div></div><div class="flow-state">${t().labels.ready}</div>`;item.addEventListener("click",()=>approveAction(index));suggestionFlow.appendChild(item)})}output.innerHTML = currentLanguage === "tr" ? `<strong>Yerel LLM Tarafından Hazırlanan Taslaklar</strong><br><br><strong>Ticket Taslağı:</strong><br>${result.ticket_draft||"-"}<br><br><strong>E-posta Taslağı:</strong><br>${result.email_draft||"-"}<br><br><strong>CRM Notu:</strong><br>${result.crm_note||"-"}` : `<strong>Local LLM Generated Drafts</strong><br><br><strong>Ticket Draft:</strong><br>${result.ticket_draft||"-"}<br><br><strong>Email Draft:</strong><br>${result.email_draft||"-"}<br><br><strong>CRM Note:</strong><br>${result.crm_note||"-"}`;copilotTitle.textContent=currentLanguage==="tr"?"Analiz Tamamlandı":"Copilot Analysis Completed";copilotCopy.textContent=currentLanguage==="tr"?"Yerel LLM çıktıları insan onayı için hazır.":"Local LLM-generated insights are ready for human review.";addLog(tr.logs.analysisCompleted);showToast(tr.logs.analysisCompleted)}catch(error){console.error(error);copilotTitle.textContent=currentLanguage==="tr"?"Analiz Başarısız":"Analysis Failed";copilotCopy.textContent=currentLanguage==="tr"?"Yerel LLM analizi tamamlanamadı. Backend loglarını kontrol edin.":"Could not complete local LLM analysis. Check backend logs.";addLog(`${tr.logs.analysisFailed}: ${error.message}`);showToast(tr.logs.analysisFailed)}});
+    $("switchInsights").addEventListener("click",()=>{const detailVisible=!detail.classList.contains("hidden");if(detailVisible){detail.classList.add("hidden");overview.classList.remove("hidden");$("switchInsights").textContent=t().auditView;showToast(currentLanguage === "tr" ? "Özet görünüm açıldı" : "Overview opened");addLog("Overview opened")}else{detail.classList.remove("hidden");overview.classList.add("hidden");$("switchInsights").textContent=t().overview;showToast(currentLanguage === "tr" ? "Analiz detayı açıldı" : "Audit view opened");addLog("Audit view opened")}});
+    scenarioSelect.addEventListener("change",()=>{currentScenario=scenarioSelect.value;applyScenario();showToast(`${scenarioSelect.options[scenarioSelect.selectedIndex].text} ${t().logs.loaded}`)});
+    languageSelect.addEventListener("change",()=>{applyLanguage(languageSelect.value);renderTranscript();renderActions();});
+    $("flagIssue").addEventListener("click",()=>{document.querySelectorAll(".message.issue").forEach(m=>m.classList.add("flagged"));actionHistory.push({type:"flag"});extractBox.innerHTML=currentLanguage==="tr"?"<strong>Riskli İfadeler işaretlendi:</strong> Risk taşıyan müşteri ifadeleri vurgulandı.":"<strong>Issues flagged:</strong> Detected risk-bearing customer statements are highlighted.";addLog(currentLanguage === "tr" ? "Riskli ifadeler işaretlendi" : "Issue-bearing transcript lines flagged");showToast(t().flagIssue)});
+    $("clearFlags").addEventListener("click",()=>{document.querySelectorAll(".message.flagged").forEach(m=>m.classList.remove("flagged"));addLog(currentLanguage === "tr" ? "İşaretler kaldırıldı" : "Transcript flags cleared");showToast(t().clearFlags)});
+    $("copySummary").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(summaryText.textContent.trim());showToast(t().copySummary);addLog("Call summary copied")}catch{showToast(currentLanguage === "tr" ? "Kopyalama desteklenmiyor" : "Copy not available");addLog("Copy attempted")}});
+    summaryText.addEventListener("input",()=>{copilotTitle.textContent=currentLanguage==="tr"?"Özet Düzenlendi":"Summary Edited";copilotCopy.textContent=currentLanguage==="tr"?"İnsan inceleyici Copilot özetini düzenledi.":"Human reviewer modified the copilot-generated call summary."});
+    $("openPitch").addEventListener("click",()=>$("modalBackdrop").classList.add("show"));$("closeModal").addEventListener("click",()=>$("modalBackdrop").classList.remove("show"));$("modalBackdrop").addEventListener("click",e=>{if(e.target===$("modalBackdrop"))$("modalBackdrop").classList.remove("show")});
+    applyLanguage(currentLanguage);applyScenario();
+  </script>
+</body>
+</html>
